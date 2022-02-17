@@ -1,0 +1,8 @@
+{
+  "domain": "maika_assistant",
+  "name": "Maika Assistant",
+  "documentation": "https://github.com/olli-ai/maika-assistant",
+  "dependencies": ["http"],
+  "requirements": ["websockets", "aiohttp", "tornado"],
+  "after_dependencies": ["camera"]
+}
