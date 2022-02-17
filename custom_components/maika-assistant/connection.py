@@ -29,29 +29,23 @@ async def ws_consumer_handler(websocket, ws_queue):
                 headers = data['data']['headers']
                 method = data['data']['method']
                 if 'body' in data['data']:
-                    payload_json = None
                     if data['data']['headers']['content-type'] == "application/x-www-form-urlencoded":
                         payload = data['data']['body']
                     elif data['data']['headers']['content-type'] == "text/plain;charset=UTF-8":
                         payload = json.dumps(data['data']['body'])
-                        payload_json = json.dumps(data['data']['body'])
                     elif data['data']['headers']['content-type'] == "application/json":
                         payload = json.dumps(data['data']['body'])
-                        payload_json = json.dumps(data['data']['body'])
                     else:
                         payload = str(data['data']['body']).encode('utf-8')
-                    
                 else:
                     payload = None
-                    payload_json = None
 
                 if method == 'POST':
                     if data['data']['path'].find('/auth/login_flow') != -1:
                         headers = {}
                         headers["Content-Type"] = data['data']['headers']['content-type']
-                    response = await session.post(url, headers=headers, data=payload)
-                else:
-                    response = await session.request(method, url, headers=headers, data=payload, json=payload_json)
+
+                response = await session.request(method, url, headers=headers, data=payload)
 
                 body = await response.read()
 
