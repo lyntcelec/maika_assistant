@@ -30,7 +30,7 @@ maika_assistant:
   report_state: true
 ```
 
-- Quay lại app Maika bấm `Next` để kết thúc quá trình accout linking
+- Quay lại app Maika bấm `Next` để kết thúc quá trình account linking
 
 # Configuration
 
