@@ -19,7 +19,9 @@
 
 - Restart Home Assistant để cập nhật component maika_assistant
 - Mở app Maika chọn tính năng smart home và thực hiện account linking: `Quản lý tài khoản liên kết` -> `Kết Nối Tài Khoản Mới`-> trong mục `Chọn nhà cung cấp`, chọn `Home Assistant`
+
   <img src="images/IMG-0928.PNG" height="800em" />
+
 - Trước khi bấm nút `Next` vui lòng copy key như hình trên và chép vào `api_key` trong file `configuration.yaml` như bên dưới, sau đó restart Home Assistant để cập nhật config
 
 ```yaml
