@@ -22,13 +22,15 @@
 
   <img src="images/IMG-0928.PNG" height="800em" />
 
-- Trước khi bấm nút `Next` vui lòng copy key như hình trên và chép vào `api_key` trong file `configuration.yaml` như bên dưới, sau đó restart Home Assistant để cập nhật config
+- Trước khi bấm nút `Next` vui lòng copy `Key` như hình trên và chép vào `api_key` trong file `configuration.yaml` của Home Assistant như config bên dưới, sau đó restart Home Assistant để cập nhật config
 
 ```yaml
 maika_assistant:
   api_key: ac4d03d06de629a465a7fc53b7c1c734e04c3c729b3673e6326c0f354b49423771802938ad4191318d1f4df78a8990da
   report_state: true
 ```
+
+- Quay lại app Maika bấm `Next` để kết thúc quá trình accout linking
 
 # Configuration
 
