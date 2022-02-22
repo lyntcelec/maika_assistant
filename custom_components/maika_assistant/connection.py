@@ -4,6 +4,7 @@ import websockets
 import json
 import aiohttp
 from websockets.exceptions import ConnectionClosed, InvalidStatusCode
+from .const import WS_HASS_URL
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -75,8 +76,7 @@ async def ws_async_processing(api_key):
     while True:
         _LOGGER.info(">Start Maika connection")
         try:
-            async with websockets.connect(
-                    'wss://ws-internal.hass.iviet.com') as websocket:
+            async with websockets.connect(WS_HASS_URL) as websocket:
                 consumer_task = asyncio.ensure_future(ws_consumer_handler(websocket, ws_queue))
                 producer_task = asyncio.ensure_future(ws_producer_handler(websocket, ws_queue))
                 message = {

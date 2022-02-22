@@ -83,6 +83,7 @@ TYPE_DEHUMIDIFIER = f"{PREFIX_TYPES}DEHUMIDIFIER"
 
 SERVICE_REQUEST_SYNC = "request_sync"
 HOMEGRAPH_URL = "https://hass.iviet.com"
+WS_HASS_URL = "wss://ws-hass.iviet.com"
 HOMEGRAPH_SCOPE = ""
 HOMEGRAPH_TOKEN_URL = ""
 REQUEST_SYNC_BASE_URL = f"{HOMEGRAPH_URL}/requestSync"
