@@ -28,6 +28,13 @@
 maika_assistant:
   api_key: ac4d03d06de629a465a7fc53b7c1c734e04c3c729b3673e6326c0f354b49423771802938ad4191318d1f4df78a8990da
   report_state: true
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 192.168.1.0/24
+    - 127.0.0.1
+    - ::1
 ```
 
 - Quay lại app Maika bấm `Next` để kết thúc quá trình account linking
