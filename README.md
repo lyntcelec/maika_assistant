@@ -23,6 +23,7 @@
   <img src="images/IMG-0928.PNG" height="800em" />
 
 - Trước khi bấm nút `Next` vui lòng copy `Key` như hình trên và chép vào `api_key` trong file `configuration.yaml` của Home Assistant như config bên dưới, sau đó restart Home Assistant để cập nhật config
+- \*\*\* Lưu ý sau khi bấm `Next` nếu ở màn hình login xuất hiện lỗi `400 bad request` hãy thêm config `http ` như bên dưới, thực hiện lại bước `liên kết tài khoản` và lấy key mới nhất.
 
 ```yaml
 maika_assistant:
