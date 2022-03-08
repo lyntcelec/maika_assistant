@@ -6,6 +6,6 @@
   "dependencies": ["http"],
   "requirements": ["websockets", "aiohttp"],
   "after_dependencies": ["camera"],
-  "codeowners": ["@home-assistant/cloud"],
+  "codeowners": ["@home-assistant/lee"],
   "iot_class": "cloud_push"
 }
