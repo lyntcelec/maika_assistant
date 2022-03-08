@@ -1,10 +1,11 @@
 {
   "domain": "maika_assistant",
   "name": "Maika Assistant",
+  "version": "1.0.1",
   "documentation": "https://github.com/olli-ai/maika_assistant",
-  "version": "1.0.0",
   "dependencies": ["http"],
   "requirements": ["websockets", "aiohttp"],
   "after_dependencies": ["camera"],
-  "codeowners": ["@home-assistant/lee"]
+  "codeowners": ["@home-assistant/cloud"],
+  "iot_class": "cloud_push"
 }
