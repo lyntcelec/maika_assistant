@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import asyncio
+from urllib.parse import urlparse
 from .connection import ws_async_processing
 
 import voluptuous as vol
@@ -29,6 +30,7 @@ from .const import (
     DEFAULT_EXPOSED_DOMAINS,
     DOMAIN,
     SERVICE_REQUEST_SYNC,
+    CONF_HASS_URL,
 )
 from .const import EVENT_QUERY_RECEIVED  # noqa: F401
 from .http import GoogleAssistantView, GoogleConfig
@@ -67,6 +69,7 @@ GOOGLE_ASSISTANT_SCHEMA = vol.All(
     vol.Schema(
         {
             vol.Required(CONF_API_KEY): cv.string,
+            vol.Required(CONF_HASS_URL): cv.string,
             vol.Optional(
                 CONF_EXPOSE_BY_DEFAULT, default=DEFAULT_EXPOSE_BY_DEFAULT
             ): cv.boolean,
@@ -99,7 +102,10 @@ async def async_setup(hass: HomeAssistant, yaml_config: ConfigType) -> bool:
     config = yaml_config[DOMAIN]
 
     api_key = config.get(CONF_API_KEY)
-    asyncio.create_task(ws_async_processing(api_key))
+    hass_url = config.get(CONF_HASS_URL)
+    url = urlparse(hass_url)
+    url = url.scheme + "://" + url.netloc
+    asyncio.create_task(ws_async_processing(api_key, url))
 
     google_config = GoogleConfig(hass, config)
     await google_config.async_initialize()

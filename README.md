@@ -24,9 +24,11 @@
 
 - Trước khi bấm nút `Next` vui lòng copy `Key` như hình trên và chép vào `api_key` trong file `configuration.yaml` của Home Assistant như config bên dưới, sau đó restart Home Assistant để cập nhật config
 - \*\*\* Lưu ý sau khi bấm `Next` nếu ở màn hình login xuất hiện lỗi `400 bad request` hãy thêm config `http ` như bên dưới, thực hiện lại bước `liên kết tài khoản` và lấy key mới nhất.
+- url: hãy chép đường dẫn mà server của bạn đang hoạt động ở môi trường mạng nội bộ , có thể là localhost hoặc ip: http://localhost:8123, http://192.168.1.99:8123, https://192.168.1.99:8123
 
 ```yaml
 maika_assistant:
+  url: http://localhost:8123
   api_key: ac4d03d06de629a465a7fc53b7c1c734e04c3c729b3673e6326c0f354b49423771802938ad4191318d1f4df78a8990da
   report_state: true
 

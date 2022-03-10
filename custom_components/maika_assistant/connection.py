@@ -16,7 +16,7 @@ def combine_buffer_message(bufMsg, bufData):
 async def ws_send(queue, msg):
     await queue.put(msg)
 
-async def ws_consumer_handler(websocket, ws_queue):
+async def ws_consumer_handler(websocket, ws_queue, url):
     session = aiohttp.ClientSession(auto_decompress=False)
     while True:
         try:
@@ -26,7 +26,7 @@ async def ws_consumer_handler(websocket, ws_queue):
                 if data['status'] != 0:
                     _LOGGER.info("No reconnect, force close Maika connection")
             elif data['topic'] == 'http_request':
-                url = "http://{host}:{port}{path}".format(host = data['data']['host'], port = data['data']['port'], path = data['data']['path'])
+                _url = "{url}{path}".format(url = url, path = data['data']['path'])
                 headers = data['data']['headers']
                 method = data['data']['method']
                 if 'body' in data['data']:
@@ -46,7 +46,7 @@ async def ws_consumer_handler(websocket, ws_queue):
                         headers = {}
                         headers["Content-Type"] = data['data']['headers']['content-type']
 
-                response = await session.request(method, url, headers=headers, data=payload)
+                response = await session.request(method, _url, headers=headers, data=payload)
 
                 body = await response.read()
 
@@ -71,13 +71,13 @@ async def ws_producer_handler(websocket, ws_queue):
         message = await ws_queue.get()
         await websocket.send(message)
 
-async def ws_async_processing(api_key):
+async def ws_async_processing(api_key, url):
     ws_queue = asyncio.Queue()
     while True:
         _LOGGER.info(">Start Maika connection")
         try:
             async with websockets.connect(WS_HASS_URL) as websocket:
-                consumer_task = asyncio.ensure_future(ws_consumer_handler(websocket, ws_queue))
+                consumer_task = asyncio.ensure_future(ws_consumer_handler(websocket, ws_queue, url))
                 producer_task = asyncio.ensure_future(ws_producer_handler(websocket, ws_queue))
                 message = {
                     "topic": "access_token",
