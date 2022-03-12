@@ -46,7 +46,7 @@ async def ws_consumer_handler(websocket, ws_queue, url):
                         headers = {}
                         headers["Content-Type"] = data['data']['headers']['content-type']
 
-                response = await session.request(method, _url, headers=headers, data=payload)
+                response = await session.request(method, _url, headers=headers, data=payload, ssl=False)
 
                 body = await response.read()
 
