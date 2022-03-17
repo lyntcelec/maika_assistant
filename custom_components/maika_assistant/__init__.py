@@ -128,7 +128,7 @@ async def async_setup(hass: HomeAssistant, yaml_config: ConfigType) -> bool:
         await google_config.async_sync_entities(agent_user_id)
 
     # Register service only if key is provided
-    if CONF_SERVICE_ACCOUNT in config:
+    if CONF_API_KEY in config:
         hass.services.async_register(
             DOMAIN, SERVICE_REQUEST_SYNC, request_sync_service_handler
         )

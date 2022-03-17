@@ -94,8 +94,8 @@ HOMEGRAPH_URL = "https://hass.iviet.com"
 WS_HASS_URL = "wss://ws-hass.iviet.com"
 HOMEGRAPH_SCOPE = ""
 HOMEGRAPH_TOKEN_URL = ""
-REQUEST_SYNC_BASE_URL = f"{HOMEGRAPH_URL}v1/devices:requestSync"
-REPORT_STATE_BASE_URL = f"{HOMEGRAPH_URL}v1/devices:reportStateAndNotification"
+REQUEST_SYNC_BASE_URL = f"{HOMEGRAPH_URL}/requestSync"
+REPORT_STATE_BASE_URL = f"{HOMEGRAPH_URL}/reportStateAndNotification"
 
 # Error codes used for SmartHomeError class
 # https://developers.google.com/actions/reference/smarthome/errors-exceptions
