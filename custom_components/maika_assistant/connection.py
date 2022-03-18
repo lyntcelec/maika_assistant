@@ -62,7 +62,7 @@ async def ws_consumer_handler(websocket, ws_queue, url):
                 bufMsg = bytes(json.dumps(message),'UTF-8')
                 buf_full = combine_buffer_message(bufMsg, body)
                 await ws_send(ws_queue, buf_full)
-        except (ConnectionClosed):
+        except (Exception):
             _LOGGER.warning("Maika connection is Closed")
             break
 
