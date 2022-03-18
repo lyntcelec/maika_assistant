@@ -97,7 +97,7 @@ async def ws_async_processing(api_key, url):
                     task.cancel()
                 await asyncio.sleep(10)
                 _LOGGER.info("Restart Maika connection>")
-        except (InvalidStatusCode):
+        except (Exception):
             _LOGGER.warning("Maika server rejected connection")
             await asyncio.sleep(10)
             _LOGGER.info("Restart Maika connection>")
