@@ -13,7 +13,7 @@ from aiohttp.web import Request, Response
 import jwt
 
 from homeassistant.components.http import HomeAssistantView
-from homeassistant.const import CLOUD_NEVER_EXPOSED_ENTITIES
+from homeassistant.const import CLOUD_NEVER_EXPOSED_ENTITIES, CONF_API_KEY
 
 # Typing imports
 from homeassistant.core import HomeAssistant
@@ -126,10 +126,7 @@ class GoogleConfig(AbstractConfig):
         entity_registry = er.async_get(self.hass)
         registry_entry = entity_registry.async_get(state.entity_id)
         if registry_entry:
-            auxiliary_entity = (
-                registry_entry.entity_category is not None
-                or registry_entry.hidden_by is not None
-            )
+            auxiliary_entity = registry_entry.entity_category is not None
         else:
             auxiliary_entity = False
 
@@ -159,8 +156,8 @@ class GoogleConfig(AbstractConfig):
         return True
 
     async def _async_request_sync_devices(self, agent_user_id: str):
-        if CONF_SERVICE_ACCOUNT in self._config:
-            return await self.async_call_homegraph_api(
+        if CONF_API_KEY in self._config:
+            return await self.async_call_homegraph_api_key(
                 REQUEST_SYNC_BASE_URL, {"agentUserId": agent_user_id}
             )
 
@@ -184,6 +181,25 @@ class GoogleConfig(AbstractConfig):
             )
             self._access_token = token["access_token"]
             self._access_token_renew = now + timedelta(seconds=token["expires_in"])
+
+    async def async_call_homegraph_api_key(self, url, data):
+        """Call a homegraph api with api key authentication."""
+        session = async_get_clientsession(self.hass)
+        try:
+            res = await session.post(
+                url, params={"key": self._config.get(CONF_API_KEY)}, json=data
+            )
+            _LOGGER.info(
+                "Response on %s with data %s was %s", url, data, await res.text()
+            )
+            res.raise_for_status()
+            return res.status
+        except ClientResponseError as error:
+            _LOGGER.error("Request for %s failed: %d", url, error.status)
+            return error.status
+        except (asyncio.TimeoutError, ClientError):
+            _LOGGER.error("Could not contact %s", url)
+            return HTTPStatus.INTERNAL_SERVER_ERROR
 
     async def async_call_homegraph_api(self, url, data):
         """Call a homegraph api with authentication."""
@@ -227,7 +243,7 @@ class GoogleConfig(AbstractConfig):
             "agentUserId": agent_user_id,
             "payload": message,
         }
-        await self.async_call_homegraph_api(REPORT_STATE_BASE_URL, data)
+        await self.async_call_homegraph_api_key(REPORT_STATE_BASE_URL, data)
 
 
 class GoogleAssistantView(HomeAssistantView):
