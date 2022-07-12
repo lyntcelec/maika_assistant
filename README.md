@@ -47,6 +47,7 @@ http:
 
 ```yaml
 maika_assistant:
+  project_id: "MAIKA"
   url: https://localhost:8123
   api_key: ac4d03d06de629a465a7fc53b7c1c734e04c3c729b3673e6326c0f354b49423771802938ad4191318d1f4df78a8990da
   report_state: true
