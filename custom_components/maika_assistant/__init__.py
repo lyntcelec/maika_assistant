@@ -8,9 +8,10 @@ from .connection import ws_async_processing
 
 import voluptuous as vol
 
-from homeassistant.const import CONF_API_KEY, CONF_NAME
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
+from homeassistant.const import CONF_API_KEY, CONF_NAME, Platform
 from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.helpers.typing import ConfigType
 
 from .const import (
@@ -26,6 +27,7 @@ from .const import (
     CONF_ROOM_HINT,
     CONF_SECURE_DEVICES_PIN,
     CONF_SERVICE_ACCOUNT,
+    DATA_CONFIG,
     DEFAULT_EXPOSE_BY_DEFAULT,
     DEFAULT_EXPOSED_DOMAINS,
     DOMAIN,
@@ -40,6 +42,8 @@ from .const import EVENT_COMMAND_RECEIVED, EVENT_SYNC_RECEIVED  # noqa: F401, is
 _LOGGER = logging.getLogger(__name__)
 
 CONF_ALLOW_UNLOCK = "allow_unlock"
+
+PLATFORMS = [Platform.BUTTON]
 
 ENTITY_SCHEMA = vol.Schema(
     {
@@ -68,6 +72,7 @@ def _check_report_state(data):
 GOOGLE_ASSISTANT_SCHEMA = vol.All(
     vol.Schema(
         {
+            vol.Required(CONF_PROJECT_ID): cv.string,
             vol.Required(CONF_API_KEY): cv.string,
             vol.Required(CONF_HASS_URL): cv.string,
             vol.Optional(
@@ -83,6 +88,7 @@ GOOGLE_ASSISTANT_SCHEMA = vol.All(
             vol.Optional(CONF_SERVICE_ACCOUNT): GOOGLE_SERVICE_ACCOUNT,
             # deprecated configuration options
             vol.Remove(CONF_ALLOW_UNLOCK): cv.boolean,
+            # vol.Remove(CONF_API_KEY): cv.string,
         },
         extra=vol.PREVENT_EXTRA,
     ),
@@ -99,6 +105,17 @@ async def async_setup(hass: HomeAssistant, yaml_config: ConfigType) -> bool:
     if DOMAIN not in yaml_config:
         return True
 
+    hass.data[DOMAIN] = {}
+    hass.data[DOMAIN][DATA_CONFIG] = yaml_config[DOMAIN]
+
+    hass.async_create_task(
+        hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": SOURCE_IMPORT},
+            data={CONF_PROJECT_ID: yaml_config[DOMAIN][CONF_PROJECT_ID]},
+        )
+    )
+
     config = yaml_config[DOMAIN]
 
     api_key = config.get(CONF_API_KEY)
@@ -107,8 +124,36 @@ async def async_setup(hass: HomeAssistant, yaml_config: ConfigType) -> bool:
     url = url.scheme + "://" + url.netloc
     asyncio.create_task(ws_async_processing(api_key, url))
 
+    return True
+
+
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up from a config entry."""
+
+    config: ConfigType = {**hass.data[DOMAIN][DATA_CONFIG]}
+
+    if entry.source == SOURCE_IMPORT:
+        # if project was changed, remove entry a new will be setup
+        if config[CONF_PROJECT_ID] != entry.data[CONF_PROJECT_ID]:
+            hass.async_create_task(hass.config_entries.async_remove(entry.entry_id))
+            return False
+
+    config.update(entry.data)
+
+    device_registry = dr.async_get(hass)
+    device_registry.async_get_or_create(
+        config_entry_id=entry.entry_id,
+        identifiers={(DOMAIN, config[CONF_PROJECT_ID])},
+        manufacturer="Google",
+        model="Google Assistant",
+        name=config[CONF_PROJECT_ID],
+        entry_type=dr.DeviceEntryType.SERVICE,
+    )
+
     google_config = GoogleConfig(hass, config)
     await google_config.async_initialize()
+
+    hass.data[DOMAIN][entry.entry_id] = google_config
 
     hass.http.register_view(GoogleAssistantView(google_config))
 
@@ -132,5 +177,7 @@ async def async_setup(hass: HomeAssistant, yaml_config: ConfigType) -> bool:
         hass.services.async_register(
             DOMAIN, SERVICE_REQUEST_SYNC, request_sync_service_handler
         )
+
+    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
 
     return True
